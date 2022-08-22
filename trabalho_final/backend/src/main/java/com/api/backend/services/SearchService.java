@@ -1,6 +1,7 @@
 package com.api.backend.services;
 
 import com.api.backend.models.Document;
+import com.api.backend.models.Result;
 import com.api.backend.models.Search;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
-    public List<Document> search(String must, String must_not, String should, int page, int page_size) throws IOException {
+    public Result search(String must, String must_not, String should, int page, int page_size) throws IOException {
         Search search = new Search("localhost", 9200);
 
         OpenSearchClient client = search.osClient();
@@ -53,19 +54,10 @@ public class SearchService {
                 , Document.class
         );
 
-        /*SearchResponse<Document> results = client.search(s -> s
-                        .index("wikipedia")
-                        .query(q -> q
-                                .match(m -> m
-                                        .query(queryMatch -> queryMatch
-                                                .stringValue(query))
-                                        .field("content")))
-                , Document.class);
-        */
-
         List<Document> documents = results.hits().hits().stream().map(hit -> hit.source()).collect(Collectors.toList());
-
-        return documents;
+        long total = results.hits().total().value();
+        
+        return new Result(documents, total);
     }
 
 }
