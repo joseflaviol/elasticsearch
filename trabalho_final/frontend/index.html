@@ -5,46 +5,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/mdb.min.css">
-    <title>SearchOn</title>
+    <title>MathOnWiki</title>
 </head>
 <body>
-    <header>
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-          <div class="container-fluid">
-            <button
-              class="navbar-toggler"
-              type="button"
-              data-mdb-toggle="collapse"
-              data-mdb-target="#navbarExample01"
-              aria-controls="navbarExample01"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <i class="fas fa-bars"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarExample01">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item active">
-                  <a class="nav-link" aria-current="page" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Features</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Pricing</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">About</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
-      </header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Container wrapper -->
+    <div class="container-fluid">
+      <!-- Toggle button -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-mdb-toggle="collapse"
+        data-mdb-target="#navbarCenteredExample"
+        aria-controls="navbarCenteredExample"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <i class="fas fa-bars"></i>
+      </button>
+  
+      <!-- Collapsible wrapper -->
+      <div
+        class="collapse navbar-collapse justify-content-center"
+        id="navbarCenteredExample"
+      >
+        <!-- Left links -->
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">MathOnWiki</a>
+          </li>
+        </ul>
+        <!-- Left links -->
+      </div>
+      <!-- Collapsible wrapper -->
+    </div>
+    <!-- Container wrapper -->
+  </nav>
       <main>
         <div class="container mt-3" id="app">
-            <div class="input-group">
+            <div class="input-group" v-if="!advancedSearch">
                 <input
                   v-model="must"
                   type="text"
@@ -52,12 +51,57 @@
                   placeholder="Digite sua busca"
                   aria-label="Recipient's username with two button addons"
                 />
-                <button class="btn btn-outline-primary" type="button" data-mdb-ripple-color="dark" v-on:click="search">
+                <button class="btn btn-dark btn-rounded" type="button" data-mdb-ripple-color="dark" v-on:click="btnSearch">
                   Buscar
                 </button>
-                <button class="btn btn-outline-primary" type="button" data-mdb-ripple-color="dark">
+                <button class="btn btn-grayish btn-rounded" type="button" data-mdb-ripple-color="dark" v-on:click="changeSearchType">
                   Opcões Avançadas de Busca
                 </button>
+            </div>
+            <div id="advancedSearch" v-if="advancedSearch">
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Must</span>
+                <input v-model="must" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
+                <select v-model="must_field" class="input-group-text" aria-label="Field">
+                  <option value="content" selected>Content</option>
+                  <option value="title">Title</option>
+                </select>
+                <span class="input-group-text" id="inputGroup-sizing-default">Match Phrase</span>
+                <div class="input-group-text">
+                  <input v-model="must_match_phrase" class="form-check-input" type="checkbox" id="checkboxNoLabel" />
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Must Not</span>
+                <input v-model="must_not" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
+                <select v-model="must_not_field" class="input-group-text" aria-label="Field">
+                  <option value="content" selected>Content</option>
+                  <option value="title">Title</option>
+                </select>
+                <span class="input-group-text" id="inputGroup-sizing-default">Match Phrase</span>
+                <div class="input-group-text">
+                  <input v-model="must_not_match_phrase" class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..." />
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Should</span>
+                <input v-model="should" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
+                <select v-model="should_field" class="input-group-text" aria-label="Field">
+                  <option value="content" selected>Content</option>
+                  <option value="title">Title</option>
+                </select>
+                <span class="input-group-text" id="inputGroup-sizing-default">Match Phrase</span>
+                <div class="input-group-text">
+                  <input v-model="should_match_phrase" class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..." />
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <button type="button" class="btn btn-dark btn-rounded" data-mdb-ripple-color="dark" v-on:click="btnSearch">Buscar</button>
+                <button type="button" class="btn btn-grayish btn-rounded" data-mdb-ripple-color="dark" v-on:click="changeSearchType">Busca Básica</button>
+              </div>
+            </div>
+            <div class="spinner-border" role="status" v-if="loading">
+              <span class="visually-hidden">Loading...</span>
             </div>
             <div class="card w-75 mt-3" v-for="document in documents">
                 <div class="card-body">
@@ -66,21 +110,11 @@
                   <a :href="document.url" class="btn btn-primary">Acessar</a>
                 </div>
             </div>
-            <nav aria-label="Page navigation example" v-if="documents">
-                <ul class="pagination">
-                    <li class="page-item" v-if="numberOfPages > 1 && page > 1">
-                        <a class="page-link" v-on:click="previousPage">Previous</a>
-                    </li>
-                    <li class="page-item" v-if="numberOfPages > 1 && page < numberOfPages">
-                        <a class="page-link" v-on:click="nextPage">Next</a>
-                    </li>
-                  <!--<li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item"><a class="page-link" href="#">Next</a></li>-->
-                </ul>
-            </nav>
+            <p v-if="documents">Showing {{ (page - 1) * documents.length + 1}} to {{ (page - 1) * documents.length + documents.length }} of {{ total }} results</p>
+            <div class="text-center m-5" v-if="documents">
+              <button class="btn btn-primary" v-if="numberOfPages > 1 && page > 1" v-on:click="previousPage">Previous</button>
+              <button class="btn btn-primary" v-if="numberOfPages > 1 && page < numberOfPages" v-on:click="nextPage">Next</button>
+            </div>
         </div>
       </main>
       <script src="js/mdb.min.js"></script>
@@ -89,23 +123,61 @@
         new Vue({
             el: '#app',
             data: {
+                loading: false,
+                advancedSearch: false,
                 must: "",
+                must_field: "content",
+                must_match_phrase: false,
                 must_not: "",
+                must_not_field: "content",
+                must_not_match_phrase: false,
                 should: "",
+                should_field: "content",
+                should_match_phrase: false,
                 documents: null,
                 total: null,
                 numberOfPages: null,
                 page: 1
             },
             methods: {
+                reset: function() {
+                    this.loading = false;
+                    this.must = "";
+                    this.must_field = "content";
+                    this.must_match_phrase = false;
+                    this.must_not = "";
+                    this.must_not_field = "content";
+                    this.must_match_phrase = false;
+                    this.should = "";
+                    this.should_field = "content";
+                    this.should_match_phrase = false;
+                    this.documents = null;
+                    this.numberOfPages = null;
+                    this.page = 1;
+                },
+                changeSearchType: function () {
+                    this.reset();
+                    this.advancedSearch = !this.advancedSearch;
+                },
+                btnSearch: function() {
+                    this.page = 1;
+                    this.search();  
+                },
                 search: function () {
-                    fetch(`http://localhost:8080/search?must=${this.must}&must_not=${this.must_not}&should=${this.should}&page=${this.page}`, { method: 'GET', mode: 'cors' })
+                    this.documents = null;
+                    this.loading = true;
+                    fetch(`http://localhost:8080/search?must=${this.must}&must_field=${this.must_field}&must_match_phrase=${this.must_match_phrase}&must_not=${this.must_not}&must_not_field=${this.must_not_field}&must_not_match_phrase=${this.must_not_match_phrase}&should=${this.should}&should_field=${this.should_field}&should_match_phrase=${this.should_match_phrase}&page=${this.page}`, { method: 'GET', mode: 'cors' })
                         .then((response) => response.json())
                         .then(data => {
                             this.documents = data.documents;
+                            if (this.documents.length == 0) {
+                                this.documents = null;
+                                return;
+                            }
                             this.total = data.total;
                             this.numberOfPages = this.total / 10;
                         });
+                    this.loading = false;
                 },
                 nextPage: function () {
                     this.page += 1;
